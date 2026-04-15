@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'modules/location/location_tracking_module.dart';
 import 'package:geolocator/geolocator.dart';
 import './modules/trip/trip_detection_module.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  await Hive.openBox('trips'); // our storage
+
   runApp(const MyApp());
 }
 
