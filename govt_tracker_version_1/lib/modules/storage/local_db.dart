@@ -1,9 +1,9 @@
 import 'package:hive/hive.dart';
-import '../modules/trip/trip_model.dart';
+import '../trip/trip_model.dart';
 
-class TripStorageService {
+class LocalDB {
 
-  final Box box = Hive.box('trips');
+  final Box<dynamic> box = Hive.box('trips');
 
   void saveTrip(Trip trip) {
     box.add({

@@ -1,9 +1,9 @@
 import 'package:geolocator/geolocator.dart';
 import './trip_model.dart';
-import '../../services/trip_storage_service.dart';
+import '../storage/local_db.dart';
 
 class TripDetectionModule {
-  final TripStorageService storage = TripStorageService();
+  final LocalDB db = LocalDB();
 
   bool tripActive = false;
 
@@ -101,8 +101,10 @@ class TripDetectionModule {
 
         // 🔥 Print full trip details
         print(trip);
-        storage.saveTrip(trip);
-        print(storage.getTrips());
+        
+        db.saveTrip(trip);
+        
+        
         print("🛑 Trip ENDED");
 
         // Reset
