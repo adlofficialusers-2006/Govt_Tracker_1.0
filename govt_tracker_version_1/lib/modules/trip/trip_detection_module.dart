@@ -6,7 +6,6 @@ class TripDetectionModule {
   final LocalDB db = LocalDB();
 
   bool tripActive = false;
-
   Position? lastPosition;
   double distanceTravelled = 0;
 
@@ -15,16 +14,17 @@ class TripDetectionModule {
   Position? stopCenter;
 
   DateTime? tripStartTime;
-  String startLocation = "Unknown";
+  String startLocation = 'Unknown';
+  String tripStatus = 'Idle';
+
+  Function(Trip, int)? onTripCompleted;
 
   void processLocation(Position position) {
+    final double speedKmph = position.speed * 3.6;
+    final DateTime now = DateTime.now();
 
-    double speedKmph = position.speed * 3.6;
-    DateTime now = DateTime.now();
-
-    // ---------- DISTANCE CALC ----------
     if (lastPosition != null) {
-      double d = Geolocator.distanceBetween(
+      final double d = Geolocator.distanceBetween(
         lastPosition!.latitude,
         lastPosition!.longitude,
         position.latitude,
@@ -37,37 +37,32 @@ class TripDetectionModule {
     }
 
     lastPosition = position;
+    print('Speed: ${speedKmph.toStringAsFixed(2)} km/h');
+    print('Distance: ${distanceTravelled.toStringAsFixed(1)} m');
 
-    print("Speed: ${speedKmph.toStringAsFixed(2)} km/h");
-    print("Distance: ${distanceTravelled.toStringAsFixed(1)} m");
-
-    // ---------- TRIP START ----------
     if (!tripActive && speedKmph > 8 && distanceTravelled > 100) {
-
       startCandidateTime ??= now;
-
       if (now.difference(startCandidateTime!).inSeconds >= 30) {
         tripActive = true;
         tripStartTime = now;
-        startLocation = "Lat: ${position.latitude}, Lng: ${position.longitude}";
-
-        print("🚀 Trip STARTED");
+        startLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
+        tripStatus = 'Trip Started';
+        print('🚀 Trip STARTED');
       }
-
     } else {
       startCandidateTime = null;
     }
+
     if (!tripActive && speedKmph < 2) {
-    distanceTravelled = 0;
+      distanceTravelled = 0;
+      tripStatus = 'Idle';
     }
 
-    // ---------- TRIP END ----------
     if (tripActive && speedKmph < 1) {
-
       stopCandidateTime ??= now;
       stopCenter ??= position;
 
-      double stopDistance = Geolocator.distanceBetween(
+      final double stopDistance = Geolocator.distanceBetween(
         stopCenter!.latitude,
         stopCenter!.longitude,
         position.latitude,
@@ -82,15 +77,13 @@ class TripDetectionModule {
 
       if (stopCandidateTime != null &&
           now.difference(stopCandidateTime!).inMinutes >= 2) {
+        final DateTime tripEndTime = now;
+        final Duration tripDuration = tripEndTime.difference(tripStartTime!);
 
-        DateTime tripEndTime = now;
-        Duration tripDuration = tripEndTime.difference(tripStartTime!);
+        final String endLocation =
+            'Lat: ${position.latitude}, Lng: ${position.longitude}';
 
-        String endLocation =
-            "Lat: ${position.latitude}, Lng: ${position.longitude}";
-
-        // 🔥 Create Trip object
-        Trip trip = Trip(
+        final Trip trip = Trip(
           startLocation: startLocation,
           endLocation: endLocation,
           distance: distanceTravelled,
@@ -99,24 +92,25 @@ class TripDetectionModule {
           endTime: tripEndTime,
         );
 
-        // 🔥 Print full trip details
         print(trip);
-        
-        db.saveTrip(trip);
-        
-        
-        print("🛑 Trip ENDED");
+        final int tripKey = db.saveTrip(trip);
+        tripStatus = 'Trip Completed';
 
-        // Reset
+        if (onTripCompleted != null) {
+          onTripCompleted!(trip, tripKey);
+        }
+
+        print('🛑 Trip ENDED');
         tripActive = false;
         distanceTravelled = 0;
         stopCandidateTime = null;
         stopCenter = null;
         tripStartTime = null;
+      } else {
+        tripStatus = 'Trip Ongoing';
       }
-
-    } else {
-      stopCandidateTime = null;
+    } else if (tripActive) {
+      tripStatus = 'Trip Ongoing';
     }
   }
-}
+} 

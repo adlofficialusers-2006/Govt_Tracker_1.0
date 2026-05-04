@@ -5,6 +5,11 @@ class Trip {
   final Duration duration;
   final DateTime startTime;
   final DateTime endTime;
+  String mode;
+  String purpose;
+  String cost;
+  String companions;
+  String frequency;
 
   Trip({
     required this.startLocation,
@@ -13,6 +18,11 @@ class Trip {
     required this.duration,
     required this.startTime,
     required this.endTime,
+    this.mode = 'Unknown',
+    this.purpose = 'Unknown',
+    this.cost = '0',
+    this.companions = '0',
+    this.frequency = 'Unknown',
   });
 
   @override
@@ -23,6 +33,11 @@ Start: $startLocation
 End: $endLocation
 Distance: ${distance.toStringAsFixed(1)} m
 Duration: ${duration.inSeconds} sec
+Mode: $mode
+Purpose: $purpose
+Cost: $cost
+Companions: $companions
+Frequency: $frequency
 ''';
   }
 }

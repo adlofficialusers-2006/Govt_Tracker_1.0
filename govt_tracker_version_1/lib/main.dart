@@ -1,10 +1,15 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'ui/screens/home_screen.dart';
+import 'package:provider/provider.dart';
 
-void main() async {
+import 'core/theme/app_theme.dart';
+import 'modules/location/location_tracking_module.dart';
+import 'modules/trip/trip_detection_module.dart';
+import 'modules/trip/trip_detection_provider.dart';
+import 'ui/screens/consent_screen.dart';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Hive.initFlutter();
   await Hive.openBox('trips');
 
@@ -16,13 +21,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'NATPAC Travel Tracker',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => TripDetectionProvider(
+            locationModule: LocationTrackingModule(),
+            detectionModule: TripDetectionModule(),
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Travel Tracker',
+        theme: AppTheme.dark,
+        home: const ConsentScreen(),
       ),
-      home: const HomeScreen(),
     );
   }
 }
