@@ -1,42 +1,33 @@
 import 'package:hive/hive.dart';
 import '../trip/trip_model.dart';
+import '../traffic/movement_log.dart';
+import '../traffic/traffic_event.dart';
 
 class LocalDB {
-  final Box<dynamic> box = Hive.box('trips');
+  static const tripsBox = 'trips';
+  static const movementLogsBox = 'movement_logs';
+  static const trafficEventsBox = 'traffic_events';
 
-  int saveTrip(Trip trip) {
-    return box.add({
-      'start': trip.startLocation,
-      'end': trip.endLocation,
-      'distance': trip.distance,
-      'duration': trip.duration.inSeconds,
-      'startTime': trip.startTime.toString(),
-      'endTime': trip.endTime.toString(),
-      'mode': trip.mode,
-      'purpose': trip.purpose,
-      'cost': trip.cost,
-      'companions': trip.companions,
-      'frequency': trip.frequency,
-      'synced': false,
-    });
+  final Box<dynamic> box = Hive.box(tripsBox);
+  final Box<dynamic> movementBox = Hive.box(movementLogsBox);
+  final Box<dynamic> trafficBox = Hive.box(trafficEventsBox);
+
+  static Future<void> openBoxes() async {
+    await Hive.openBox(tripsBox);
+    await Hive.openBox(movementLogsBox);
+    await Hive.openBox(trafficEventsBox);
   }
 
-  void updateTrip(int key, Map<String, dynamic> updates) {
-    final trip = box.get(key);
-    if (trip != null && trip is Map) {
-      final updatedTrip = Map<String, dynamic>.from(trip);
-      updatedTrip.addAll(updates);
-      box.put(key, updatedTrip);
-    }
+  void saveTrip(Trip trip) {
+    box.add(trip.toMap());
   }
 
-  void markAsSynced(int key) {
-    final trip = box.get(key);
-    if (trip != null && trip is Map) {
-      final updatedTrip = Map<String, dynamic>.from(trip);
-      updatedTrip['synced'] = true;
-      box.put(key, updatedTrip);
-    }
+  void saveMovementLog(MovementLog log) {
+    movementBox.add(log.toMap());
+  }
+
+  void saveTrafficEvent(TrafficEvent event) {
+    trafficBox.add(event.toMap());
   }
 
   List getTrips() {
@@ -45,11 +36,41 @@ class LocalDB {
 
   List<Map<String, dynamic>> getTripsWithKeys() {
     return box.keys.map((key) {
-      final trip = box.get(key);
-      if (trip is Map<String, dynamic>) {
-        return {...trip, 'key': key as int};
-      }
-      return <String, dynamic>{};
+      final value = box.get(key);
+      final trip = Map<String, dynamic>.from(value as Map);
+      trip['key'] = key;
+      return trip;
     }).toList();
+  }
+
+  void updateTrip(dynamic key, Map<String, dynamic> updates) {
+    final existing = box.get(key);
+    if (existing is! Map) return;
+
+    final trip = Map<String, dynamic>.from(existing);
+    trip.addAll(updates);
+    box.put(key, trip);
+  }
+
+  void markAsSynced(dynamic key) {
+    updateTrip(key, {'synced': true});
+  }
+
+  List<MovementLog> getRecentMovementLogs({
+    Duration window = const Duration(minutes: 3),
+  }) {
+    final cutoff = DateTime.now().subtract(window);
+    return movementBox.values
+        .whereType<Map>()
+        .map(MovementLog.fromMap)
+        .where((log) => log.timestamp.isAfter(cutoff))
+        .toList();
+  }
+
+  List<TrafficEvent> getTrafficEvents() {
+    return trafficBox.values
+        .whereType<Map>()
+        .map(TrafficEvent.fromMap)
+        .toList();
   }
 }

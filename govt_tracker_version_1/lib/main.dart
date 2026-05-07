@@ -1,17 +1,18 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'core/theme/app_theme.dart';
 import 'modules/location/location_tracking_module.dart';
-import 'modules/trip/trip_detection_module.dart';
-import 'modules/trip/trip_detection_provider.dart';
+import 'modules/storage/local_db.dart';
+import 'modules/traffic/crowd_detection_service.dart';
+import 'modules/trip/trip_lifecycle_controller.dart';
 import 'ui/screens/consent_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Hive.openBox('trips');
+  await LocalDB.openBoxes();
 
   runApp(const MyApp());
 }
@@ -23,11 +24,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider(create: (_) => LocalDB()),
         ChangeNotifierProvider(
-          create: (_) => TripDetectionProvider(
-            locationModule: LocationTrackingModule(),
-            detectionModule: TripDetectionModule(),
-          ),
+          create: (context) {
+            final db = context.read<LocalDB>();
+            return TripLifecycleController(
+              locationModule: LocationTrackingModule(),
+              db: db,
+              crowdDetectionService: CrowdDetectionService(db: db),
+            );
+          },
         ),
       ],
       child: MaterialApp(

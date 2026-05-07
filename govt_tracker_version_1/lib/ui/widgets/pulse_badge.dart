@@ -13,11 +13,21 @@ class PulseBadge extends StatelessWidget {
       duration: const Duration(milliseconds: 450),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: active ? AppColors.neonBlue.withOpacity(0.18) : AppColors.panel,
+        color: active
+            ? AppColors.neonBlue.withValues(alpha: 0.18)
+            : AppColors.panel,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: active ? AppColors.neonBlue : AppColors.border),
+        border: Border.all(
+          color: active ? AppColors.neonBlue : AppColors.border,
+        ),
         boxShadow: active
-            ? [BoxShadow(color: AppColors.neonBlue.withOpacity(0.18), blurRadius: 20, spreadRadius: 1)]
+            ? [
+                BoxShadow(
+                  color: AppColors.neonBlue.withValues(alpha: 0.18),
+                  blurRadius: 20,
+                  spreadRadius: 1,
+                ),
+              ]
             : null,
       ),
       child: Text(

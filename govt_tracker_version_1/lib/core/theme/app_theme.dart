@@ -7,21 +7,28 @@ class AppTheme {
     colorScheme: const ColorScheme.dark(
       primary: AppColors.neonBlue,
       secondary: AppColors.neonPurple,
-      background: AppColors.background,
+      surface: AppColors.background,
     ),
     textTheme: const TextTheme(
       bodyLarge: TextStyle(color: AppColors.textPrimary),
       bodyMedium: TextStyle(color: AppColors.textSecondary),
-      titleLarge: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+      titleLarge: TextStyle(
+        color: AppColors.textPrimary,
+        fontWeight: FontWeight.bold,
+      ),
       titleMedium: TextStyle(color: AppColors.textPrimary),
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
       iconTheme: IconThemeData(color: AppColors.neonBlue),
-      titleTextStyle: TextStyle(color: AppColors.neonBlue, fontSize: 20, fontWeight: FontWeight.bold),
+      titleTextStyle: TextStyle(
+        color: AppColors.neonBlue,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: AppColors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 0,

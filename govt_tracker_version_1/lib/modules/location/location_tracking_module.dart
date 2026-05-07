@@ -1,7 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 
 class LocationTrackingModule {
-
   Future<bool> requestPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
 

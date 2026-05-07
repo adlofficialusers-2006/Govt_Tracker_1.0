@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
-import '../../ui/screens/home_screen.dart';
 import '../../modules/location/location_tracking_module.dart';
+import '../../ui/screens/home_screen.dart';
 
 class ConsentScreen extends StatefulWidget {
   const ConsentScreen({super.key});
@@ -26,7 +27,7 @@ class _ConsentScreenState extends State<ConsentScreen> {
 
     setState(() {
       isLoading = true;
-      message = 'Requesting permission from the device…';
+      message = 'Requesting permission from the device...';
     });
 
     final granted = await locationModule.requestPermission();
@@ -60,16 +61,22 @@ class _ConsentScreenState extends State<ConsentScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 12),
-              Text('travel Tracker',
-                  style: TextStyle(
-                    color: AppColors.neonPurple,
-                    fontSize: 36,
-                    fontWeight: FontWeight.w800,
-                  )),
+              Text(
+                'travel Tracker',
+                style: TextStyle(
+                  color: AppColors.neonPurple,
+                  fontSize: 36,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
               const SizedBox(height: 12),
               Text(
                 'A premium travel research app that captures automatic trips and guides users to add travel details securely.',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 16, height: 1.6),
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 16,
+                  height: 1.6,
+                ),
               ),
               const SizedBox(height: 28),
               Expanded(
@@ -84,20 +91,39 @@ class _ConsentScreenState extends State<ConsentScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Data Collection Overview',
-                          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+                      const Text(
+                        'Data Collection Overview',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                       const SizedBox(height: 16),
-                      _buildBullet('GPS-based trip detection for start/end capture'),
-                      _buildBullet('Distance, duration, and route summary storage'),
-                      _buildBullet('User-provided mode, purpose, cost, and companions'),
+                      _buildBullet(
+                        'GPS-based trip detection for start/end capture',
+                      ),
+                      _buildBullet(
+                        'Distance, duration, and route summary storage',
+                      ),
+                      _buildBullet(
+                        'User-provided mode, purpose, cost, and companions',
+                      ),
                       _buildBullet('Local storage with safe sync-ready state'),
                       const Spacer(),
                       SwitchListTile.adaptive(
                         value: locationConsent,
-                        onChanged: (value) => setState(() => locationConsent = value),
-                        title: const Text('Enable Location Permission', style: TextStyle(color: Colors.white)),
-                        subtitle: const Text('This must be enabled for trip detection to work.', style: TextStyle(color: Colors.white60)),
-                        activeColor: AppColors.neonBlue,
+                        onChanged: (value) =>
+                            setState(() => locationConsent = value),
+                        title: const Text(
+                          'Enable Location Permission',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        subtitle: const Text(
+                          'This must be enabled for trip detection to work.',
+                          style: TextStyle(color: Colors.white60),
+                        ),
+                        activeThumbColor: AppColors.neonBlue,
                         contentPadding: EdgeInsets.zero,
                       ),
                     ],
@@ -105,7 +131,10 @@ class _ConsentScreenState extends State<ConsentScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(message, style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+              Text(
+                message,
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+              ),
               const SizedBox(height: 18),
               SizedBox(
                 width: double.infinity,
@@ -117,8 +146,21 @@ class _ConsentScreenState extends State<ConsentScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: isLoading
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
-                      : const Text('Agree & Continue', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.black,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Agree & Continue',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ],
@@ -134,8 +176,20 @@ class _ConsentScreenState extends State<ConsentScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('• ', style: TextStyle(color: AppColors.neonBlue, fontSize: 18)),
-          Expanded(child: Text(text, style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.5))),
+          const Text(
+            '- ',
+            style: TextStyle(color: AppColors.neonBlue, fontSize: 18),
+          ),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 15,
+                height: 1.5,
+              ),
+            ),
+          ),
         ],
       ),
     );

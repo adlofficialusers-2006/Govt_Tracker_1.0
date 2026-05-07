@@ -1,12 +1,14 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
-import '../../ui/widgets/glass_card.dart';
+import '../../core/utils/formatters.dart';
 import '../../modules/storage/local_db.dart';
 import '../../modules/trip/trip_model.dart';
+import '../../ui/widgets/glass_card.dart';
 
 class TripFormScreen extends StatefulWidget {
   final Trip trip;
-  final int tripKey;
+  final dynamic tripKey;
 
   const TripFormScreen({super.key, required this.trip, required this.tripKey});
 
@@ -29,9 +31,13 @@ class _TripFormScreenState extends State<TripFormScreen> {
     super.initState();
     mode = widget.trip.mode != 'Unknown' ? widget.trip.mode : 'Car';
     purpose = widget.trip.purpose != 'Unknown' ? widget.trip.purpose : 'Work';
-    frequency = widget.trip.frequency != 'Unknown' ? widget.trip.frequency : 'Daily';
+    frequency = widget.trip.frequency != 'Unknown'
+        ? widget.trip.frequency
+        : 'Daily';
     costController.text = widget.trip.cost != '0' ? widget.trip.cost : '';
-    companionsController.text = widget.trip.companions != '0' ? widget.trip.companions : '';
+    companionsController.text = widget.trip.companions != '0'
+        ? widget.trip.companions
+        : '';
   }
 
   @override
@@ -55,7 +61,10 @@ class _TripFormScreenState extends State<TripFormScreen> {
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Trip details saved successfully.', style: TextStyle(color: AppColors.background)),
+        content: Text(
+          'Trip details saved successfully.',
+          style: TextStyle(color: AppColors.background),
+        ),
         backgroundColor: AppColors.neonBlue,
       ),
     );
@@ -65,35 +74,55 @@ class _TripFormScreenState extends State<TripFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Complete Trip Details'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Complete Trip Details'), elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Tell us more about your trip', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+            const Text(
+              'Tell us more about your trip',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
             Text(
               'Share the trip purpose, cost, companions and frequency for travel research.',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 15, height: 1.5),
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 15,
+                height: 1.5,
+              ),
             ),
             const SizedBox(height: 24),
             GlassCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Trip Summary', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Trip Summary',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   _buildRow('From', widget.trip.startLocation),
                   const SizedBox(height: 12),
                   _buildRow('To', widget.trip.endLocation),
                   const SizedBox(height: 12),
-                  _buildRow('Distance', '${widget.trip.distance.toStringAsFixed(1)} m'),
+                  _buildRow('Distance', formatDistance(widget.trip.distance)),
                   const SizedBox(height: 12),
-                  _buildRow('Duration', '${widget.trip.duration.inMinutes} min'),
+                  _buildRow('Duration', formatDuration(widget.trip.duration)),
+                  const SizedBox(height: 12),
+                  _buildRow(
+                    'Traffic delay',
+                    formatDuration(widget.trip.trafficDelayDuration),
+                  ),
                 ],
               ),
             ),
@@ -102,15 +131,35 @@ class _TripFormScreenState extends State<TripFormScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  _buildDropdown('Mode of Transport', mode, ['Car', 'Bike', 'Bus', 'Train', 'Walk'], (value) => setState(() => mode = value!)),
+                  _buildDropdown(
+                    'Mode of Transport',
+                    mode,
+                    ['Car', 'Bike', 'Bus', 'Train', 'Walk'],
+                    (value) => setState(() => mode = value!),
+                  ),
                   const SizedBox(height: 18),
-                  _buildDropdown('Trip Purpose', purpose, ['Work', 'Home', 'Shopping', 'Leisure', 'Education'], (value) => setState(() => purpose = value!)),
+                  _buildDropdown(
+                    'Trip Purpose',
+                    purpose,
+                    ['Work', 'Home', 'Shopping', 'Leisure', 'Education'],
+                    (value) => setState(() => purpose = value!),
+                  ),
                   const SizedBox(height: 18),
-                  _buildTextField('Travel Cost', costController, 'Enter your cost'),
+                  _buildTextField('Travel Cost', costController, 'Enter cost'),
                   const SizedBox(height: 18),
-                  _buildTextField('Companions', companionsController, 'Number of companions', numeric: true),
+                  _buildTextField(
+                    'Companions',
+                    companionsController,
+                    'Number of companions',
+                    numeric: true,
+                  ),
                   const SizedBox(height: 18),
-                  _buildDropdown('Frequency', frequency, ['Daily', 'Weekly', 'Occasional', 'First time'], (value) => setState(() => frequency = value!)),
+                  _buildDropdown(
+                    'Frequency',
+                    frequency,
+                    ['Daily', 'Weekly', 'Occasional', 'First time'],
+                    (value) => setState(() => frequency = value!),
+                  ),
                 ],
               ),
             ),
@@ -120,8 +169,14 @@ class _TripFormScreenState extends State<TripFormScreen> {
               height: 54,
               child: ElevatedButton(
                 onPressed: saveDetails,
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.neonBlue, foregroundColor: Colors.black),
-                child: const Text('Save Trip', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.neonBlue,
+                  foregroundColor: Colors.black,
+                ),
+                child: const Text(
+                  'Save Trip',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
@@ -133,13 +188,30 @@ class _TripFormScreenState extends State<TripFormScreen> {
   Widget _buildRow(String label, String value) {
     return Row(
       children: [
-        Expanded(flex: 3, child: Text(label, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600))),
-        Expanded(flex: 5, child: Text(value, style: const TextStyle(color: Colors.white))),
+        Expanded(
+          flex: 3,
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 5,
+          child: Text(value, style: const TextStyle(color: Colors.white)),
+        ),
       ],
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, String hint, {bool numeric = false}) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller,
+    String hint, {
+    bool numeric = false,
+  }) {
     return TextFormField(
       controller: controller,
       keyboardType: numeric ? TextInputType.number : TextInputType.text,
@@ -150,28 +222,48 @@ class _TripFormScreenState extends State<TripFormScreen> {
         hintStyle: TextStyle(color: AppColors.textSecondary),
         filled: true,
         fillColor: AppColors.surface,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
       ),
-      validator: (value) => value == null || value.trim().isEmpty ? 'This field is required' : null,
+      validator: (value) => value == null || value.trim().isEmpty
+          ? 'This field is required'
+          : null,
     );
   }
 
-  Widget _buildDropdown(String label, String current, List<String> options, ValueChanged<String?> onChanged) {
+  Widget _buildDropdown(
+    String label,
+    String current,
+    List<String> options,
+    ValueChanged<String?> onChanged,
+  ) {
     return InputDecorator(
       decoration: InputDecoration(
         labelText: label,
         filled: true,
         fillColor: AppColors.surface,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
       ),
       child: DropdownButtonFormField<String>(
-        value: current,
+        initialValue: current,
         decoration: const InputDecoration(border: InputBorder.none),
         dropdownColor: AppColors.surface,
         style: const TextStyle(color: Colors.white),
         iconEnabledColor: AppColors.neonBlue,
         onChanged: onChanged,
-        items: options.map((value) => DropdownMenuItem(value: value, child: Text(value, style: const TextStyle(color: Colors.white)))).toList(),
+        items: options
+            .map(
+              (value) => DropdownMenuItem(
+                value: value,
+                child: Text(value, style: const TextStyle(color: Colors.white)),
+              ),
+            )
+            .toList(),
       ),
     );
   }

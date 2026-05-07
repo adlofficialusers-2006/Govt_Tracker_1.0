@@ -13,7 +13,14 @@ class TripDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 16),
           ...children,
         ],
@@ -26,8 +33,20 @@ class TripDetailScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Expanded(flex: 3, child: Text(label, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600))),
-          Expanded(flex: 5, child: Text(value, style: const TextStyle(color: Colors.white))),
+          Expanded(
+            flex: 3,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 5,
+            child: Text(value, style: const TextStyle(color: Colors.white)),
+          ),
         ],
       ),
     );
@@ -35,14 +54,22 @@ class TripDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final duration = trip['duration'] is int ? Duration(seconds: trip['duration'] as int) : const Duration();
+    final duration = trip['duration'] is int
+        ? Duration(seconds: trip['duration'] as int)
+        : const Duration();
+    final pausedDuration = trip['pausedDuration'] is int
+        ? Duration(seconds: trip['pausedDuration'] as int)
+        : const Duration();
+    final trafficDelayDuration = trip['trafficDelayDuration'] is int
+        ? Duration(seconds: trip['trafficDelayDuration'] as int)
+        : const Duration();
+    final distance = trip['distance'] is num
+        ? (trip['distance'] as num).toDouble()
+        : 0.0;
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Trip Details'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Trip Details'), elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -51,8 +78,10 @@ class TripDetailScreen extends StatelessWidget {
             _buildSection('Route Overview', [
               _buildRow('Start', trip['start'] ?? 'Unknown'),
               _buildRow('End', trip['end'] ?? 'Unknown'),
-              _buildRow('Distance', '${(trip['distance'] ?? 0).toStringAsFixed(1)} m'),
+              _buildRow('Distance', formatDistance(distance)),
               _buildRow('Duration', formatDuration(duration)),
+              _buildRow('Paused time', formatDuration(pausedDuration)),
+              _buildRow('Traffic delay', formatDuration(trafficDelayDuration)),
             ]),
             const SizedBox(height: 16),
             _buildSection('Travel Details', [
@@ -64,7 +93,10 @@ class TripDetailScreen extends StatelessWidget {
             ]),
             const SizedBox(height: 16),
             _buildSection('Timeline', [
-              _buildRow('Started', formatDateTime(trip['startTime'] ?? 'Unknown')),
+              _buildRow(
+                'Started',
+                formatDateTime(trip['startTime'] ?? 'Unknown'),
+              ),
               _buildRow('Ended', formatDateTime(trip['endTime'] ?? 'Unknown')),
             ]),
           ],
